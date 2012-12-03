@@ -403,6 +403,8 @@ class AddTorrentDialog(component.Component):
             options["prioritize_first_last_pieces"])
         self.glade.get_widget("chk_move_completed").set_active(
             options["move_completed"])
+        self.glade.get_widget("chk_seedmode").set_active(
+            options["seed_mode"])
 
     def save_torrent_options(self, row=None):
         # Keeps the torrent options dictionary up-to-date with what the user has
@@ -454,6 +456,8 @@ class AddTorrentDialog(component.Component):
             self.glade.get_widget("chk_prioritize").get_active()
         options["move_completed"] = \
             self.glade.get_widget("chk_move_completed").get_active()
+        options["seed_mode"] = \
+            self.glade.get_widget("chk_seedmode").get_active()
 
         self.options[torrent_id] = options
 
@@ -507,6 +511,7 @@ class AddTorrentDialog(component.Component):
             self.core_config["prioritize_first_last_pieces"])
         self.glade.get_widget("chk_move_completed").set_active(
             self.core_config["move_completed"])
+        self.glade.get_widget("chk_seedmode").set_active(False)
 
     def get_file_priorities(self, torrent_id):
         # A list of priorities
