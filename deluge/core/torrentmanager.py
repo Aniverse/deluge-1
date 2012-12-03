@@ -197,6 +197,8 @@ class TorrentManager(component.Component):
             self.on_alert_file_error)
         self.alerts.register_handler("file_completed_alert",
             self.on_alert_file_completed)
+        self.alerts.register_handler("performance_alert",
+            self.on_alert_performance)
 
     def start(self):
         # Get the pluginmanager reference
@@ -1129,3 +1131,20 @@ class TorrentManager(component.Component):
             return
         component.get("EventManager").emit(
             TorrentFileCompletedEvent(torrent_id, alert.index))
+
+    def on_alert_performance(self, alert):
+        log.debug("performance_alert: %s", alert.message())
+        try:
+            if alert.message().endswith("send buffer watermark too low (upload rate will suffer)"):
+                # if send buffer is too small, try doubling its size
+                settings = component.get("Core").session.settings()
+                # cap buffer at 50MiB
+                if settings.send_buffer_watermark <= 26214400:
+                    log.debug("send_buffer_watermark set to %s..",
+                        2 * settings.send_buffer_watermark)
+                    setattr(settings, "send_buffer_watermark",
+                        2 * settings.send_buffer_watermark)
+                    self.session.set_settings(settings)
+
+        except:
+            return
