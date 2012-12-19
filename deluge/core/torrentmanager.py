@@ -1145,6 +1145,16 @@ class TorrentManager(component.Component):
                     setattr(settings, "send_buffer_watermark",
                         2 * settings.send_buffer_watermark)
                     self.session.set_settings(settings)
+            elif alert.message().endswith("performance warning: max outstanding disk writes reached"):
+                # if write cache is too small, try doubling its size
+                settings = component.get("Core").session.settings()
+                # cap buffer at 64MiB
+                if settings.max_queued_disk_bytes <= 33554432:
+                    log.debug("max_queued_disk_bytes set to %s..",
+                        2 * settings.max_queued_disk_bytes)
+                    setattr(settings, "max_queued_disk_bytes",
+                        2 * settings.max_queued_disk_bytes)
+                    self.session.set_settings(settings)
 
         except:
             return
